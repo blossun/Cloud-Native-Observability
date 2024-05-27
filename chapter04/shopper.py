@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
 from opentelemetry import context, trace
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor
 
+
 def configure_tracer():
     exporter = ConsoleSpanExporter()
-    span_processor = BatchSpanProcessor(exporter) # 스팬처리기 변경
-    provider = TracerProvider()
+    span_processor = BatchSpanProcessor(exporter)  # 스팬처리기 변경
+    resource = Resource.create(
+        {
+            "service_name": "shopper",
+            "service_version": "0.1.2",
+        }
+    )
+    provider = TracerProvider(resource=resource)
     provider.add_span_processor(span_processor)
     trace.set_tracer_provider(provider)
     return trace.get_tracer("shopper.py", "0.0.1")  # 추적기 획득 (계측모듈 이름, 버전)
 
 
-tracer = configure_tracer() # 추적기 인스턴스를 전역으로 설정
+tracer = configure_tracer()  # 추적기 인스턴스를 전역으로 설정
 
 
 @tracer.start_as_current_span("add item to cart")
