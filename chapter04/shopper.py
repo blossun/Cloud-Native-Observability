@@ -9,6 +9,7 @@ def configure_tracer():
     provider = TracerProvider()
     provider.add_span_processor(span_processor)
     trace.set_tracer_provider(provider)
+    return trace.get_tracer("shopper.py", "0.0.1") # 추적기 획득 (계측모듈 이름, 버전)
 
 if __name__ == "__main__":
-    configure_tracer()
+    tracer = configure_tracer()
