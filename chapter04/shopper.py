@@ -5,22 +5,22 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor
 
 
-def configure_tracer():
+def configure_tracer(name, version):
     exporter = ConsoleSpanExporter()
     span_processor = BatchSpanProcessor(exporter)  # 스팬처리기 변경
     resource = Resource.create(
         {
-            "service_name": "shopper",
-            "service_version": "0.1.2",
+            "service_name": name,
+            "service_version": version,
         }
     )
     provider = TracerProvider(resource=resource)
     provider.add_span_processor(span_processor)
     trace.set_tracer_provider(provider)
-    return trace.get_tracer("shopper.py", "0.0.1")  # 추적기 획득 (계측모듈 이름, 버전)
+    return trace.get_tracer(name, version)  # 추적기 획득 (계측모듈 이름, 버전)
 
 
-tracer = configure_tracer()  # 추적기 인스턴스를 전역으로 설정
+tracer = configure_tracer("shopper", "0.1.2")  # 추적기 인스턴스를 전역으로 설정
 
 
 @tracer.start_as_current_span("add item to cart")
@@ -42,6 +42,7 @@ def visit_store():
 if __name__ == "__main__":
     # case 3 : 데코레이터 사용 -------------------------------------------------------------------------------------
     visit_store()
+    tracer = configure_tracer("shopper", "0.1.2")
 
     # case 2 ---------------------------------------------------------------------------------------------------
     # tracer = configure_tracer()
