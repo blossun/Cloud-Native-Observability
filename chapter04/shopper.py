@@ -3,16 +3,20 @@ from opentelemetry import context, trace
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor
+from local_machine_resource_detector import LocalMachineResourceDetector
 
 
 def configure_tracer(name, version):
     exporter = ConsoleSpanExporter()
-    span_processor = BatchSpanProcessor(exporter)  # 스팬처리기 변경
-    resource = Resource.create(
-        {
-            "service_name": name,
-            "service_version": version,
-        }
+    span_processor = SimpleSpanProcessor(exporter)  # 스팬처리기 변경
+    local_resource = LocalMachineResourceDetector().detect()
+    resource = local_resource.merge(
+        Resource.create(
+            {
+                "service_name": name,
+                "service_version": version,
+            }
+        )
     )
     provider = TracerProvider(resource=resource)
     provider.add_span_processor(span_processor)
