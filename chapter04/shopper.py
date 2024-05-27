@@ -3,6 +3,9 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
 
+def browse():
+    print("visiting the grocery store")
+
 def configure_tracer():
     exporter = ConsoleSpanExporter()
     span_processor = SimpleSpanProcessor(exporter)
@@ -13,3 +16,6 @@ def configure_tracer():
 
 if __name__ == "__main__":
     tracer = configure_tracer()
+    span = tracer.start_span("visit store") # 스팬 생성
+    browse()
+    span.end() # 작업 완료 후 end 호출
