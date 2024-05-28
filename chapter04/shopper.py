@@ -25,17 +25,17 @@ def browse():
     with tracer.start_as_current_span(  # 컨텍스트 매니저는 web request라는 이름의 새로운 스팬을 CLIENT로 지정해서 시작
             "web request", kind=trace.SpanKind.CLIENT
     ) as span:
-        url = "http://localhost:5000"  # grocery-store
+        url = "http://localhost:5000/products"  # grocery-store
         span.set_attributes({
             SpanAttributes.HTTP_METHOD: "GET",
             SpanAttributes.HTTP_FLAVOR: "1.1",
             SpanAttributes.HTTP_URL: url,
             SpanAttributes.NET_PEER_IP: "127.0.0.1",
         })
-    headers = {}
-    inject(headers)  # HTTP 요청의 헤더로 전달될 딕셔너리 객체를 span_context에 설정
-    resp = requests.get(url, headers=headers)
-    span.set_attribute(SpanAttributes.HTTP_STATUS_CODE, resp.status_code)  # 응답 정보도 스팬 속성에 넣어주자
+        headers = {}
+        inject(headers)  # HTTP 요청의 헤더로 전달될 딕셔너리 객체를 span_context에 설정
+        resp = requests.get(url, headers=headers)
+        span.set_attribute(SpanAttributes.HTTP_STATUS_CODE, resp.status_code)  # 응답 정보도 스팬 속성에 넣어주자
     add_item_to_cart("orange", 5)
 
 
