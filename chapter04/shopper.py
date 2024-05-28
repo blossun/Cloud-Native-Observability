@@ -35,6 +35,11 @@ def add_item_to_cart(item):
 @tracer.start_as_current_span("browse")
 def browse():
     print("visiting the grocery store")
+    span = trace.get_current_span()  # 현재 스팬을 얻어옴
+    span.set_attribute("http.method", "GET")
+    span.set_attribute("http.flavor", "1.1")
+    span.set_attribute("http.url", "http://localhost:5000")
+    span.set_attribute("net.peer.ip", "127.0.0.1")
     add_item_to_cart("orange")
 
 
