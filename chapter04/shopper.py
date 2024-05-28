@@ -29,7 +29,12 @@ tracer = configure_tracer("shopper", "0.1.2")  # 추적기 인스턴스를 전�
 
 
 @tracer.start_as_current_span("add item to cart")
-def add_item_to_cart(item):
+def add_item_to_cart(item, quantity=1):
+    span = trace.get_current_span()  # 현재 스팬을 얻어옴
+    span.set_attributes({
+        "item": item,
+        "quantity": quantity,
+    })
     print("add {} to cart".format(item))
 
 
@@ -43,7 +48,7 @@ def browse():
         SpanAttributes.HTTP_URL: "http://localhost:5000",
         SpanAttributes.NET_PEER_IP: "127.0.0.1",
     })
-    add_item_to_cart("orange")
+    add_item_to_cart("orange", 5)
 
 
 @tracer.start_as_current_span("visit store")
