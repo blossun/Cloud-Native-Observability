@@ -35,9 +35,24 @@ def browse():
         headers = {}
         inject(headers)  # HTTP 요청의 헤더로 전달될 딕셔너리 객체를 span_context에 설정
         span.add_event("about to send a request")
-        resp = requests.get(url, headers=headers)
-        span.add_event("request sent", attributes={"url": url}, timestamp=0)
-        span.set_attribute(SpanAttributes.HTTP_STATUS_CODE, resp.status_code)  # 응답 정보도 스팬 속성에 넣어주자
+        try:
+            url = "invalid_url"
+            resp = requests.get(url, headers=headers)  # 잘못된 url로 요청을 날려서 에러를 캐치해보자
+            span.add_event(  # 스팬에 event 정보 추가
+                "request sent",
+                Attributes={"url": url},
+                timestamp=0,
+            )
+            span.set_attribute(  # 스팬 속성은 별개로 저장
+                SpanAttributes.HTTP_STATUS_CODE,
+                resp.status_code
+            )
+        except Exception as err:
+            attributes = {
+                SpanAttributes.EXCEPTION_MESSAGE: str(err),
+            }
+            span.add_event("exception", attributes=attributes)  # 에러 캐치한 내용을 이벤트로 저장
+
     add_item_to_cart("orange", 5)
 
 
