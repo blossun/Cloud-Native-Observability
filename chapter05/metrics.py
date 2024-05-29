@@ -41,10 +41,19 @@ if __name__ == "__main__":
     # counter.add(1, {"locale": "es-ES"})  # counter는 음수를 넣을 수 없음
 
     # 비동기 카운터
-    meter.create_observable_counter(
-        name="major_page_faults",
-        callbacks=[async_counter_callback],
-        description="page faults requiring I/O",
-        unit="fault"
+    # meter.create_observable_counter(
+    #     name="major_page_faults",
+    #     callbacks=[async_counter_callback],
+    #     description="page faults requiring I/O",
+    #     unit="fault"
+    # )
+    # time.sleep(10)
+
+    # 업/다운 카운터
+    inventory_counter = meter.create_up_down_counter(
+        name="inventory",
+        unit="items",
+        description="Number of items in inventory",
     )
-    time.sleep(10)
+    inventory_counter.add(20)
+    inventory_counter.add(-5)
