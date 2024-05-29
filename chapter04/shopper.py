@@ -23,7 +23,7 @@ def add_item_to_cart(item, quantity=1):
 def browse():
     print("visiting the grocery store")
     with tracer.start_as_current_span(  # 컨텍스트 매니저는 web request라는 이름의 새로운 스팬을 CLIENT로 지정해서 시작
-            "web request", kind=trace.SpanKind.CLIENT
+            "web request", kind=trace.SpanKind.CLIENT, record_exception=False  # 예외를 기록하지 않도록 비활성화
     ) as span:
         url = "http://localhost:5000/products"  # grocery-store
         span.set_attributes({
@@ -42,7 +42,7 @@ def browse():
         # record_exception 에서 드를 직접 호출하는 것과 동일한 효과
         span.add_event(  # 스팬에 event 정보 추가
             "request sent",
-            Attributes={"url": url},
+            attributes={"url": url},
             timestamp=0,
         )
         span.set_attribute(  # 스팬 속성은 별개로 저장
