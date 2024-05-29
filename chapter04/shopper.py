@@ -48,10 +48,7 @@ def browse():
                 resp.status_code
             )
         except Exception as err:
-            attributes = {
-                SpanAttributes.EXCEPTION_MESSAGE: str(err),
-            }
-            span.add_event("exception", attributes=attributes)  # 에러 캐치한 내용을 이벤트로 저장
+            span.record_exception(err)  # 에러 캐치한 내용을 이벤트로 저장
 
     add_item_to_cart("orange", 5)
 
