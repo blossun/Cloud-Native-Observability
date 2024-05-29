@@ -24,7 +24,10 @@ def add_item_to_cart(item, quantity=1):
 def browse():
     print("visiting the grocery store")
     with tracer.start_as_current_span(  # 컨텍스트 매니저는 web request라는 이름의 새로운 스팬을 CLIENT로 지정해서 시작
-            "web request", kind=trace.SpanKind.CLIENT, record_exception=False  # 예외를 기록하지 않도록 비활성화
+            "web request",
+            kind=trace.SpanKind.CLIENT,
+            set_status_on_exception=True,  # 예외가 발생했을 때, 예외를 기록하면서 스팬 상태를 설정할 수 있도록 함
+            # record_exception=False  # 예외를 기록하지 않도록 비활성화
     ) as span:
         url = "http://localhost:5000/products/invalid"  # grocery-store
         span.set_attributes({
@@ -37,6 +40,7 @@ def browse():
         inject(headers)  # HTTP 요청의 헤더로 전달될 딕셔너리 객체를 span_context에 설정
         span.add_event("about to send a request")
 
+        # url = "invalid_url"
         resp = requests.get(url, headers=headers)
         if resp:
             span.set_status(Status(StatusCode.OK))
