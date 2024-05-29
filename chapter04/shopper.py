@@ -3,6 +3,7 @@ import requests
 from opentelemetry import trace
 from opentelemetry.semconv.trace import SpanAttributes
 from opentelemetry.propagate import inject
+from opentelemetry.trace import StatusCode, Status
 
 from common import configure_tracer
 
@@ -25,7 +26,7 @@ def browse():
     with tracer.start_as_current_span(  # 컨텍스트 매니저는 web request라는 이름의 새로운 스팬을 CLIENT로 지정해서 시작
             "web request", kind=trace.SpanKind.CLIENT, record_exception=False  # 예외를 기록하지 않도록 비활성화
     ) as span:
-        url = "http://localhost:5000/products"  # grocery-store
+        url = "http://localhost:5000/products/invalid"  # grocery-store
         span.set_attributes({
             SpanAttributes.HTTP_METHOD: "GET",
             SpanAttributes.HTTP_FLAVOR: "1.1",
@@ -36,10 +37,13 @@ def browse():
         inject(headers)  # HTTP 요청의 헤더로 전달될 딕셔너리 객체를 span_context에 설정
         span.add_event("about to send a request")
 
-        url = "invalid_url"
         resp = requests.get(url, headers=headers)
-        # 잘못된 url로 요청을 날려서 에러가 발생하면 파이썬 SDK에서 예외를 자동포착해서 예외이벤트롤 추가한다.
-        # record_exception 에서 드를 직접 호출하는 것과 동일한 효과
+        if resp:
+            span.set_status(Status(StatusCode.OK))
+        else:
+            span.set_status(
+                Status(StatusCode.ERROR, "status code: {}".format(resp.status_code))
+            )
         span.add_event(  # 스팬에 event 정보 추가
             "request sent",
             attributes={"url": url},
