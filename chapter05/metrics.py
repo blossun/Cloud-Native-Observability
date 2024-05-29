@@ -1,4 +1,6 @@
-from opentelemetry.metrics import set_meter_provider, get_meter_provider
+import time
+
+from opentelemetry.metrics import set_meter_provider, get_meter_provider, Observation
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import (
     ConsoleMetricExporter,
@@ -15,6 +17,10 @@ def configure_meter_provider():
     set_meter_provider(provider)
 
 
+def async_counter_callback(result):
+    yield Observation(10)
+
+
 if __name__ == "__main__":
     configure_meter_provider()
     # get_meter_provider()로 앞에 설정한 전역 MeterProvider에 접근 가능
@@ -24,11 +30,21 @@ if __name__ == "__main__":
         version="0.1.2",
         schema_url="https://opentelemetry.io/schemas/1.9.0"
     )
-    counter = meter.create_counter(
-        "items_sold",
-        unit="items",
-        description="Total items sold"
+
+    # 카운터
+    # counter = meter.create_counter(
+    #     "items_sold",
+    #     unit="items",
+    #     description="Total items sold"
+    # )
+    # counter.add(6, {"locale": "fr-FR", "country": "CA"})
+    # counter.add(1, {"locale": "es-ES"})  # counter는 음수를 넣을 수 없음
+
+    # 비동기 카운터
+    meter.create_observable_counter(
+        name="major_page_faults",
+        callbacks=[async_counter_callback],
+        description="page faults requiring I/O",
+        unit="fault"
     )
-    counter.add(6, {"locale": "fr-FR", "country": "CA"})
-    counter.add(1, {"locale": "es-ES"})  # counter는 음수를 넣을 수 없음
-    input("Press any key to exit...")
+    time.sleep(10)
