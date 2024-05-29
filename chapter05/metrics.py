@@ -1,4 +1,4 @@
-from opentelemetry.metrics import set_meter_provider
+from opentelemetry.metrics import set_meter_provider, get_meter_provider
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import (
     ConsoleMetricExporter,
@@ -7,6 +7,7 @@ from opentelemetry.sdk.metrics.export import (
 from opentelemetry.sdk.resources import Resource
 
 
+# 전역 MeterProvider 설정
 def configure_meter_provider():
     exporter = ConsoleMetricExporter()  # 메트릭을 콘솔로 출력해주는 익스포터 설정
 
@@ -17,3 +18,10 @@ def configure_meter_provider():
 
 if __name__ == "__main__":
     configure_meter_provider()
+    # get_meter_provider()로 앞에 설정한 전역 MeterProvider에 접근 가능
+    # get_meter()로 미터를 얻어옴
+    meter = get_meter_provider().get_meter(
+        name="metric-example",
+        version="0.1.2",
+        schema_url="https://opentelemetry.io/schemas/1.9.0"
+    )
