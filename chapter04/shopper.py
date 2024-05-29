@@ -34,7 +34,9 @@ def browse():
         })
         headers = {}
         inject(headers)  # HTTP 요청의 헤더로 전달될 딕셔너리 객체를 span_context에 설정
+        span.add_event("about to send a request")
         resp = requests.get(url, headers=headers)
+        span.add_event("request sent", attributes={"url": url}, timestamp=0)
         span.set_attribute(SpanAttributes.HTTP_STATUS_CODE, resp.status_code)  # 응답 정보도 스팬 속성에 넣어주자
     add_item_to_cart("orange", 5)
 
