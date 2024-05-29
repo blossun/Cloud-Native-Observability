@@ -21,6 +21,11 @@ def async_counter_callback(result):
     yield Observation(10)
 
 
+def async_updowncounter_callback(result):
+    yield Observation(20, {"local": "en-US"})
+    yield Observation(10, {"local": "fr-CA"})
+
+
 if __name__ == "__main__":
     configure_meter_provider()
     # get_meter_provider()로 앞에 설정한 전역 MeterProvider에 접근 가능
@@ -50,10 +55,18 @@ if __name__ == "__main__":
     # time.sleep(10)
 
     # 업/다운 카운터
-    inventory_counter = meter.create_up_down_counter(
-        name="inventory",
-        unit="items",
-        description="Number of items in inventory",
+    # inventory_counter = meter.create_up_down_counter(
+    #     name="inventory",
+    #     unit="items",
+    #     description="Number of items in inventory",
+    # )
+    # inventory_counter.add(20)
+    # inventory_counter.add(-5)
+
+    # 비동기 업/다운 카운터
+    updown_counter = meter.create_observable_up_down_counter(
+        name="customer_in_store",
+        callbacks=[async_updowncounter_callback],
+        unit="persons",
+        description="Keeps a count of customers in the store"
     )
-    inventory_counter.add(20)
-    inventory_counter.add(-5)
