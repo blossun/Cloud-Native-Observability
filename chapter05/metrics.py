@@ -17,7 +17,12 @@ def configure_meter_provider():
     exporter = ConsoleMetricExporter()  # 메트릭을 콘솔로 출력해주는 익스포터 설정
     reader = PeriodicExportingMetricReader(exporter=exporter, export_interval_millis=5000)  # 5초 주기로 메트릭을 추출
     view_all = View(instrument_name="*", aggregation=DropAggregation())  # 기본 뷰 비 활성화를 위해 와일드카드 뷰를 설정하면서 DropAggregation 옵션을 지정
-    view = View(instrument_type=Counter, attribute_keys=["locale"])  # 필터링해서 보여줄 계측기 지정 - Counter 타입의 계측기와 일치하도록 뷰를 구성, locale을 제외한 모든 디멘션을 무시
+    view = View(
+        instrument_type=Counter,
+        attribute_keys=set(),  # 필터링해서 보여줄 계측기 지정 - 모든 속성을 제거 -> 집계된 단일 메트릭이 출력
+        name="sold",
+        description="total itemsold",
+    )
     provider = MeterProvider(
         metric_readers=[reader],
         resource=Resource.create(),
