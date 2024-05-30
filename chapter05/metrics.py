@@ -1,7 +1,7 @@
 import resource
 import time
 
-from opentelemetry.metrics import set_meter_provider, get_meter_provider, Observation
+from opentelemetry.metrics import set_meter_provider, get_meter_provider, Observation, Counter
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics._internal.aggregation import DropAggregation
 from opentelemetry.sdk.metrics._internal.view import View
@@ -17,7 +17,7 @@ def configure_meter_provider():
     exporter = ConsoleMetricExporter()  # 메트릭을 콘솔로 출력해주는 익스포터 설정
     reader = PeriodicExportingMetricReader(exporter=exporter, export_interval_millis=5000)  # 5초 주기로 메트릭을 추출
     view_all = View(instrument_name="*", aggregation=DropAggregation())  # 기본 뷰 비 활성화를 위해 와일드카드 뷰를 설정하면서 DropAggregation 옵션을 지정
-    view = View(instrument_name="inventory")  # 필터링해서 보여줄 계측기 지정
+    view = View(instrument_type=Counter, attribute_keys=["locale"])  # 필터링해서 보여줄 계측기 지정 - Counter 타입의 계측기와 일치하도록 뷰를 구성, locale을 제외한 모든 디멘션을 무시
     provider = MeterProvider(
         metric_readers=[reader],
         resource=Resource.create(),
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         description="page faults requiring I/O",
         unit="fault"
     )
-    time.sleep(10)
+    # time.sleep(10)
 
     # 업/다운 카운터
     inventory_counter = meter.create_up_down_counter(
@@ -102,4 +102,4 @@ if __name__ == "__main__":
         callbacks=[async_gauge_callback],
         description="Max resident set size",
     )
-    time.sleep(10)
+    # time.sleep(10)
