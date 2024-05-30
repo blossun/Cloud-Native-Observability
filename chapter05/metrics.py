@@ -3,7 +3,7 @@ import time
 
 from opentelemetry.metrics import set_meter_provider, get_meter_provider, Observation, Counter
 from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics._internal.aggregation import DropAggregation
+from opentelemetry.sdk.metrics._internal.aggregation import DropAggregation, LastValueAggregation
 from opentelemetry.sdk.metrics._internal.view import View
 from opentelemetry.sdk.metrics.export import (
     ConsoleMetricExporter,
@@ -22,6 +22,7 @@ def configure_meter_provider():
         attribute_keys=set(),  # 필터링해서 보여줄 계측기 지정 - 모든 속성을 제거 -> 집계된 단일 메트릭이 출력
         name="sold",
         description="total itemsold",
+        aggregation=LastValueAggregation()  # 집계 방식 변경 - 마지막으로 기록된 값 하나만 보여준다.
     )
     provider = MeterProvider(
         metric_readers=[reader],
