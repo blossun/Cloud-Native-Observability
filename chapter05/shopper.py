@@ -5,10 +5,10 @@ from opentelemetry.semconv.trace import SpanAttributes
 from opentelemetry.propagate import inject
 from opentelemetry.trace import StatusCode, Status
 
-from common import configure_tracer
+from common import configure_tracer, configure_meter
 
 tracer = configure_tracer("shopper", "0.1.2")  # 추적기 인스턴스를 전역으로 설정
-
+meter = configure_meter("shopper", "0.1.2"  )# 미터(meter) 인스턴스를 전역으로 설정
 
 @tracer.start_as_current_span("add item to cart")
 def add_item_to_cart(item, quantity=1):
@@ -67,24 +67,4 @@ def visit_store():
 
 
 if __name__ == "__main__":
-    # case 3 : 데코레이터 사용 -------------------------------------------------------------------------------------
     visit_store()
-    tracer = configure_tracer("shopper", "0.1.2")
-
-    # case 2 ---------------------------------------------------------------------------------------------------
-    # tracer = configure_tracer()
-    # with tracer.start_as_current_span("visit store"):
-    #     with tracer.start_as_current_span("browse"):
-    #         browse()
-    #         with tracer.start_as_current_span("add item to cart"):
-    #             add_item_to_cart("orange")
-
-    # case 1 ---------------------------------------------------------------------------------------------------
-    # span = tracer.start_span("visit store") # 스팬 생성
-    # ctx = trace.set_span_in_context(span) # 스팬을 컨텍스트에 할당하여 스팬을 활성화 - 두 번째 스팬 시작 전 컨텍스트 지정을 위해 사용할 컨텍스트 객체를 return해준다.
-    # token = context.attach(ctx) # 전달된 컨텍스트 인자로 현재의 컨텍스트를 지정. 응답 값은 고유의 토큰
-    # span2 = tracer.start_span("browse")
-    # browse()
-    # span2.end()
-    # context.detach(token) # 컨텍스트를 이전 상태로 되돌리기
-    # span.end() # 작업 완료 후 end 호출
