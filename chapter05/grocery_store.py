@@ -24,8 +24,15 @@ app = Flask(__name__)
 @app.before_request
 def before_request():
     token = context.attach(extract(request.headers))
-    request_counter.add(1)  # 요청이 들어오면 카운트를 증가
+    # request_counter.add(1)  # 요청이 들어오면 카운트를 증가
     request.environ["context_token"] = token
+
+
+@app.after_request
+def after_request(response):
+    request_counter.add(1, {"code": response.status_code})  # 요청 수를 +1하면서 응답 상태코드를 메트릭에 관한 속성으로 기록되도록 추가
+    return response
+
 
 @app.teardown_request
 def teardown_request_func(err):
