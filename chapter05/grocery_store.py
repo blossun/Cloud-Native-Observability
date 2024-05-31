@@ -4,20 +4,27 @@ from opentelemetry import trace, context
 from opentelemetry.propagate import extract, inject, set_global_textmap
 from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
 from opentelemetry.trace import SpanKind
-from common import configure_tracer, set_span_attributes_from_flask
+from common import configure_tracer, set_span_attributes_from_flask, configure_meter
 from opentelemetry.propagators.b3 import B3MultiFormat
 from opentelemetry.propagators.composite import CompositePropagator
 from opentelemetry.trace.propagation import tracecontext
 
 tracer = configure_tracer("grocery-store", "0.1.2")
-app = Flask(__name__)
+meter = configure_meter("shopper", "0.1.2")  # 미터(meter) 인스턴스를 전역으로 설정
+request_counter = meter.create_counter(
+    name="shopper.request_count",
+    unit="request",
+    description="Total number of requests"
+)
 set_global_textmap(CompositePropagator([tracecontext.TraceContextTextMapPropagator(), B3MultiFormat()]))
 # 복합 전파기를 사용하도록 2개를 등록
+app = Flask(__name__)
 
 
 @app.before_request
 def before_request():
     token = context.attach(extract(request.headers))
+    request_counter.add(1)  # 요청이 들어오면 카운트를 증가
     request.environ["context_token"] = token
 
 @app.teardown_request
