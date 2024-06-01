@@ -13,6 +13,12 @@ from opentelemetry.trace.propagation import tracecontext
 
 tracer = configure_tracer("grocery-store", "0.1.2")
 meter = configure_meter("shopper", "0.1.2")  # 미터(meter) 인스턴스를 전역으로 설정
+# 동시 요청 수 측정
+concurrent_counter = meter.create_up_down_counter(
+    name="concurrent_requests",
+    unit="request",
+    description="Total number of concurrent requests",
+)
 request_counter = meter.create_counter(
     name="shopper.request_count",
     unit="request",
@@ -43,6 +49,7 @@ def before_request():
     request_counter.add(1, {})  # 요청이 들어오면 카운트를 증가
     request.environ["context_token"] = token
     request.environ["start_time"] = time.time_ns()
+    concurrent_counter.add(1)
 
 
 @app.after_request
@@ -50,6 +57,7 @@ def after_request(response):
     request_counter.add(1, {"code": response.status_code})  # 요청 수를 +1하면서 응답 상태코드를 메트릭에 관한 속성으로 기록되도록 추가
     duration = (time.time_ns() - request.environ["start_time"]) / 1e6
     total_duration_histo.record(duration)
+    concurrent_counter.add(-1)
     return response
 
 
