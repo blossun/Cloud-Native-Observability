@@ -1,5 +1,7 @@
+import resource
+
 from opentelemetry import trace
-from opentelemetry.metrics import set_meter_provider, get_meter_provider
+from opentelemetry.metrics import set_meter_provider, get_meter_provider, Observation
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics._internal.export import ConsoleMetricExporter, PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
@@ -62,3 +64,18 @@ def set_span_attributes_from_flask():
         SpanAttributes.HTTP_TARGET: request.path,
         SpanAttributes.HTTP_CLIENT_IP: request.remote_addr,
     })
+
+
+# 애플리케이션의 최대 RSS를 기록
+def record_max_rss_callback(result):
+    yield Observation(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+
+
+# 비동기 게이지를 생성하는 편의성 메서드
+def start_recording_memory_metrics(meter):
+    meter.create_observable_gauge(
+        callbacks=[record_max_rss_callback],
+        name="maxrss",
+        unit="bytes",
+        description="Max resident set size",
+    )

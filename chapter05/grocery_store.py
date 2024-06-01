@@ -6,7 +6,7 @@ from opentelemetry import trace, context
 from opentelemetry.propagate import extract, inject, set_global_textmap
 from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
 from opentelemetry.trace import SpanKind
-from common import configure_tracer, set_span_attributes_from_flask, configure_meter
+from common import configure_tracer, set_span_attributes_from_flask, configure_meter, start_recording_memory_metrics
 from opentelemetry.propagators.b3 import B3MultiFormat
 from opentelemetry.propagators.composite import CompositePropagator
 from opentelemetry.trace.propagation import tracecontext
@@ -100,4 +100,5 @@ def products():
 
 
 if __name__ == "__main__":
+    start_recording_memory_metrics(meter)
     app.run()

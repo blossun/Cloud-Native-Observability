@@ -5,7 +5,7 @@ from opentelemetry import context
 from opentelemetry.propagate import extract, set_global_textmap
 from opentelemetry.propagators.b3 import B3MultiFormat
 from opentelemetry.trace import SpanKind
-from common import configure_tracer, set_span_attributes_from_flask, configure_meter
+from common import configure_tracer, set_span_attributes_from_flask, configure_meter, start_recording_memory_metrics
 
 tracer = configure_tracer("legacy-inventory", "0.9.1")
 meter = configure_meter("legacy-inventory", "0.9.1")
@@ -53,4 +53,5 @@ def inventory():
 
 
 if __name__ == "__main__":
+    start_recording_memory_metrics(meter)
     app.run(debug=True, port=5001)

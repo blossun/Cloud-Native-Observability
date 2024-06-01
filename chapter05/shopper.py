@@ -7,7 +7,7 @@ from opentelemetry.semconv.trace import SpanAttributes
 from opentelemetry.propagate import inject
 from opentelemetry.trace import StatusCode, Status
 
-from common import configure_tracer, configure_meter
+from common import configure_tracer, configure_meter, start_recording_memory_metrics
 
 tracer = configure_tracer("shopper", "0.1.2")  # 추적기 인스턴스를 전역으로 설정
 meter = configure_meter("shopper", "0.1.2")  # 미터(meter) 인스턴스를 전역으로 설정
@@ -90,4 +90,5 @@ def visit_store():
 
 
 if __name__ == "__main__":
+    start_recording_memory_metrics(meter)
     visit_store()
