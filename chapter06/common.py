@@ -18,7 +18,16 @@ from flask import request
 
 
 def configure_logger(name, version):
-    provider = LoggerProvider(resource=Resource.create())  # SDK를 이용해서 LoggerProvider를 생성. resource 인 전달
+    local_resource = LocalMachineResourceDetector().detect()
+    resource = local_resource.merge(
+        Resource.create(
+            {
+                ResourceAttributes.SERVICE_NAME: name,
+                ResourceAttributes.SERVICE_VERSION: version,
+            }
+        )
+    )
+    provider = LoggerProvider(resource=resource)  # SDK를 이용해서 LoggerProvider를 생성. resource 인 전달
     set_logger_provider(provider)  # 전역 Logger로 설정
     exporter = ConsoleLogExporter()
     provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
