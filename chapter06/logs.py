@@ -27,7 +27,8 @@ if __name__ == "__main__":
             severity_number=SeverityNumber.INFO,
         )
     )
-    logger = logging.getLogger(__file__)  # 표준 Logger 객체 생성
+    logger = logging.getLogger(__file__)  # 표준 Logger 객체 생성. 부모 로거의 심각도를 상속받음 - info 수준의 로그 메시지는 표시되지 않는다.
+    logger.setLevel(logging.DEBUG)  # 로그 수준 변경
     handler = LoggingHandler()
     logger.addHandler(handler)
-    logger.warning("second log line`", extra={"key1": "val1"})  # 속성으로 유용한 정보를 남긴다.
+    logger.info("second log line`", extra={"key1": "val1"})  # 속성으로 유용한 정보를 남긴다.
