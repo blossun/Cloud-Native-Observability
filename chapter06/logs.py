@@ -1,7 +1,8 @@
+import logging
 import time
 
 from opentelemetry._logs import set_logger_provider, get_logger_provider, SeverityNumber
-from opentelemetry.sdk._logs import LoggerProvider, LogRecord
+from opentelemetry.sdk._logs import LoggerProvider, LogRecord, LoggingHandler
 from opentelemetry.sdk._logs._internal.export import ConsoleLogExporter, BatchLogRecordProcessor
 from opentelemetry.sdk.resources import Resource
 
@@ -26,3 +27,7 @@ if __name__ == "__main__":
             severity_number=SeverityNumber.INFO,
         )
     )
+    logger = logging.getLogger(__file__)  # 표준 Logger 객체 생성
+    handler = LoggingHandler()
+    logger.addHandler(handler)
+    logger.warning("second log line`")
