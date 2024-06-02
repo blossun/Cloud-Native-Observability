@@ -1,4 +1,5 @@
 import time
+from logging.config import dictConfig
 
 import requests
 from flask import Flask, request
@@ -6,13 +7,29 @@ from opentelemetry import trace, context
 from opentelemetry.propagate import extract, inject, set_global_textmap
 from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
 from opentelemetry.trace import SpanKind
-from common import configure_tracer, set_span_attributes_from_flask, configure_meter, start_recording_memory_metrics
+from common import configure_tracer, set_span_attributes_from_flask, configure_meter, start_recording_memory_metrics, \
+    configure_logger
 from opentelemetry.propagators.b3 import B3MultiFormat
 from opentelemetry.propagators.composite import CompositePropagator
 from opentelemetry.trace.propagation import tracecontext
 
 tracer = configure_tracer("grocery-store", "0.1.2")
-meter = configure_meter("shopper", "0.1.2")  # 미터(meter) 인스턴스를 전역으로 설정
+meter = configure_meter("grocery-store", "0.1.2")  # 미터(meter) 인스턴스를 전역으로 설정
+logger = configure_logger("grocery-store", "0.1.2")
+
+dictConfig(
+    {
+        "version": 1,
+        "handlers": {
+            "otlp": {
+                "class": "opentelemetry.sdk._logs.LoggingHandler",
+            }
+        },
+        "root": {"level": "DEBUG", "handlers": ["otlp"]},
+    }
+)
+
+
 # 동시 요청 수 측정
 concurrent_counter = meter.create_up_down_counter(
     name="concurrent_requests",
