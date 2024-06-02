@@ -4,6 +4,7 @@ from logging.config import dictConfig
 import requests
 from flask import Flask, request
 from opentelemetry import trace, context
+from opentelemetry.instrumentation.wsgi import OpenTelemetryMiddleware
 from opentelemetry.propagate import extract, inject, set_global_textmap
 from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
 from opentelemetry.trace import SpanKind
@@ -44,6 +45,7 @@ request_counter = meter.create_counter(
 set_global_textmap(CompositePropagator([tracecontext.TraceContextTextMapPropagator(), B3MultiFormat()]))
 # 복합 전파기를 사용하도록 2개를 등록
 app = Flask(__name__)
+app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)  # 요청 처리 중에 추적 정보를 생성 할 수 있는 적절한 메커니즘과 연결되는 미들웨어를 제공
 
 # grocery_store 애플리케이션 내의 전체 연산 지속 시간을 포착
 total_duration_histo = meter.create_histogram(
