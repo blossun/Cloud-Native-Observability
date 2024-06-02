@@ -1,6 +1,6 @@
 import time
 
-from opentelemetry._logs import set_logger_provider, get_logger_provider
+from opentelemetry._logs import set_logger_provider, get_logger_provider, SeverityNumber
 from opentelemetry.sdk._logs import LoggerProvider, LogRecord
 from opentelemetry.sdk._logs._internal.export import ConsoleLogExporter, BatchLogRecordProcessor
 from opentelemetry.sdk.resources import Resource
@@ -23,5 +23,6 @@ if __name__ == "__main__":
         LogRecord(   # LogRecord 생성
             timestamp=time.time_ns(),
             body="first log line",
+            severity_number=SeverityNumber.INFO,
         )
     )
