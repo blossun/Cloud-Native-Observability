@@ -7,10 +7,11 @@ from opentelemetry.semconv.trace import SpanAttributes
 from opentelemetry.propagate import inject
 from opentelemetry.trace import StatusCode, Status
 
-from common import configure_tracer, configure_meter, start_recording_memory_metrics
+from common import configure_tracer, configure_meter, start_recording_memory_metrics, configure_logger
 
 tracer = configure_tracer("shopper", "0.1.2")  # 추적기 인스턴스를 전역으로 설정
 meter = configure_meter("shopper", "0.1.2")  # 미터(meter) 인스턴스를 전역으로 설정
+logger = configure_logger("shopper", "0.1.2")  # 로거를 획득해서 전역으로 설정
 
 # shopper 애플리케이션 내의 전체 연산 지속 시간을 포착
 total_duration_histo = meter.create_histogram(
@@ -34,7 +35,7 @@ def add_item_to_cart(item, quantity=1):
         "item": item,
         "quantity": quantity,
     })
-    print("add {} to cart".format(item))
+    logger.info("add {} to cart".format(item))
 
 
 @tracer.start_as_current_span("browse")

@@ -1,7 +1,11 @@
+import logging
 import resource
 
 from opentelemetry import trace
+from opentelemetry._logs import set_logger_provider
 from opentelemetry.metrics import set_meter_provider, get_meter_provider, Observation
+from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+from opentelemetry.sdk._logs._internal.export import ConsoleLogExporter, BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics._internal.export import ConsoleMetricExporter, PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
@@ -11,6 +15,18 @@ from opentelemetry.semconv.resource import ResourceAttributes
 from local_machine_resource_detector import LocalMachineResourceDetector
 from opentelemetry.semconv.trace import SpanAttributes
 from flask import request
+
+
+def configure_logger(name, version):
+    provider = LoggerProvider(resource=Resource.create())  # SDK를 이용해서 LoggerProvider를 생성. resource 인 전달
+    set_logger_provider(provider)  # 전역 Logger로 설정
+    exporter = ConsoleLogExporter()
+    provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
+    logger = logging.getLogger(name)   # 표준 Logger 객체 생성
+    logger.setLevel(logging.DEBUG)
+    handler = LoggingHandler()
+    logger.addHandler(handler)
+    return logger
 
 
 def configure_meter(name, version):
