@@ -21,7 +21,7 @@ if __name__ == "__main__":
         version="0.1.2",
     )
     logger.emit(  # 방출할 로그 엔트리 생성을 요청
-        LogRecord(   # LogRecord 생성
+        LogRecord(  # LogRecord 생성
             timestamp=time.time_ns(),
             body="first log line",
             severity_number=SeverityNumber.INFO,
@@ -30,4 +30,4 @@ if __name__ == "__main__":
     logger = logging.getLogger(__file__)  # 표준 Logger 객체 생성
     handler = LoggingHandler()
     logger.addHandler(handler)
-    logger.warning("second log line`")
+    logger.warning("second log line`", extra={"key1": "val1"})  # 속성으로 유용한 정보를 남긴다.
