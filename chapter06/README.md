@@ -1,6 +1,6 @@
-# Chapter 5 examples
+# Chapter 6 examples
 
-This folder contains examples for Chapter 5.
+This folder contains examples for Chapter 6.
 
 ## Prerequisites
 
@@ -13,13 +13,11 @@ mkdir cloud_native_observability
 python3 -m venv cloud_native_observability
 source cloud_native_observability/bin/activate
 
-# install OpenTelemetry packages
-pip install opentelemetry-api \
-            opentelemetry-sdk \
-            opentelemetry-propagator-b3
-
-# install additional libraries
+# install packages
+pip install opentelemetry-api opentelemetry-sdk opentelemetry-propagator-b3
 pip install flask requests
+
+pip install opentelemetry-instrumentation-wsgi==0.39.b0
 ```
 
 ---
