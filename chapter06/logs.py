@@ -1,5 +1,7 @@
+import time
+
 from opentelemetry._logs import set_logger_provider, get_logger_provider
-from opentelemetry.sdk._logs import LoggerProvider
+from opentelemetry.sdk._logs import LoggerProvider, LogRecord
 from opentelemetry.sdk._logs._internal.export import ConsoleLogExporter, BatchLogRecordProcessor
 from opentelemetry.sdk.resources import Resource
 
@@ -15,5 +17,11 @@ if __name__ == "__main__":
     configure_logger_provider()
     logger = get_logger_provider().get_logger(  # OpenTelemetry API로 로거를 생성
         "shopper",
-        instrumenting_module_verison="0.1.2",
+        version="0.1.2",
+    )
+    logger.emit(  # 방출할 로그 엔트리 생성을 요청
+        LogRecord(   # LogRecord 생성
+            timestamp=time.time_ns(),
+            body="first log line",
+        )
     )
