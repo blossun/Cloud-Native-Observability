@@ -40,24 +40,9 @@ def configure_logger(name, version):
 
 def configure_meter(name, version):
     exporter = ConsoleMetricExporter()
-    reader = PeriodicExportingMetricReader(exporter, export_interval_millis=5000)
-    local_resource = LocalMachineResourceDetector().detect()
-    resource = local_resource.merge(
-        Resource.create(
-            {
-                ResourceAttributes.SERVICE_NAME: name,
-                ResourceAttributes.SERVICE_VERSION: version,
-            }
-        )
-    )
-    provider = MeterProvider(metric_readers=[reader], resource=resource)
+    provider = MeterProvider()
     set_meter_provider(provider)
-    schema_url = "https://opentelemetry.io/schemas/1.9.0"
-    return get_meter_provider().get_meter(
-        name=name,
-        version=version,
-        schema_url=schema_url,
-    )
+    return get_meter_provider().get_meter(name, version)
 
 
 def configure_tracer(name, version):

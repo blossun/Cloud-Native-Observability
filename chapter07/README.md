@@ -35,6 +35,25 @@ opentelemetry-instrument --traces_exporter console \
 python http_request.py
 ```
 
+### 추적 설정
+```shell
+OTEL_TRACES_EXPORTER=console \
+OTEL_PYTHON_TRACER_PROVIDER=sdk \
+opentelemetry-instrument --metrics_exporter console \
+--logs_exporter console \
+python http_request.py
+```
+
+
+### 메트릭 속성
+```shell
+OTEL_TRACES_EXPORTER=console \
+OTEL_METRICS_EXPORTER=console \
+OTEL_PYTHON_TRACER_PROVIDER=sdk \
+opentelemetry-instrument --logs_exporter console \
+python http_request.py
+```
+
 
 ---
 
