@@ -54,6 +54,26 @@ opentelemetry-instrument --logs_exporter console \
 python http_request.py
 ```
 
+# 7.5
+## legacy-inventory 애플리케이션
+수동 계측 코드(커스텀 데코레이터)를 삭제하고 순수 애플리케이션 코드만 남긴다.
+
+opentelemetry-instrumentation-flask 패키지를 통해 설치한 Flask 계측기가 수동 계측 코드를 대체
+```shell
+OTEL_RESOURCE_ATTRIBUTES="service.name=legacy-inventory,
+	service.version=0.9.1,
+	net.host.name='hostname',
+	net.host.ip='ipconfig getifaddr en0'" \
+OTEL_TRACES_EXPORTER=console \
+OTEL_PYTHON_TRACER_PROVIDER=sdk \
+OTEL_METRICS_EXPORTER=console \
+OTEL_PYTHON_METER_PROVIDER=sdk \
+OTEL_LOGS_EXPORTER=console \
+OTEL_PYTHON_LOGGER_PROVIDER=sdk \
+OTEL_PROPAGATORS=b3 \
+opentelemetry-instrument python legacy_inventory.py
+```
+
 
 ---
 
