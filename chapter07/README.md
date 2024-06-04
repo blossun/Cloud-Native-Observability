@@ -25,6 +25,17 @@ pip install flask \
               opentelemetry-instrumentation-requests
 ```
 
+### 자동 설정
+#### 리소스 속성
+```shell
+OTEL_RESOURCE_ATTRIBUTES="service.name=chap7-Requests-app, service.version=0.1.2, net.host.name='hostname', net.host.ip='ipconfig getifaddr en0'" \
+opentelemetry-instrument --traces_exporter console \
+--metrics_exporter console \
+--logs_exporter console \
+python http_request.py
+```
+
+
 ---
 
 _Cloud Native Observability_
