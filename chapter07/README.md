@@ -74,6 +74,24 @@ OTEL_PROPAGATORS=b3 \
 opentelemetry-instrument python legacy_inventory.py
 ```
 
+## grocery-store
+- service.name과 service. version은 다른 애플리케이션을 반영하도록 업데이트됩니다.
+- 전파기는 B3와 TraceContext 형식을 이용하도록 설정되어 shopper부터 legacy-inventory까지 컨텍스트가 전파되도록 합니다.
+
+```shell
+OTEL_RESOURCE_ATTRIBUTES="service.name=grocery-store,
+	service.version=0.1.2,
+	net.host.name='hostname',
+	net.host.ip='ipconfig getifaddr en0'" \
+OTEL_TRACES_EXPORTER=console \
+OTEL_PYTHON_TRACER_PROVIDER=sdk \
+OTEL_METRICS_EXPORTER=console \
+OTEL_PYTHON_METER_PROVIDER=sdk \
+OTEL_LOGS_EXPORTER=console \
+OTEL_PYTHON_LOGGER_PROVIDER=sdk \
+OTEL_PROPAGATORS=b3,tracecontext \
+opentelemetry-instrument python grocery_store.py
+```
 
 ---
 
