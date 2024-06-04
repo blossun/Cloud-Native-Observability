@@ -93,6 +93,24 @@ OTEL_PROPAGATORS=b3,tracecontext \
 opentelemetry-instrument python grocery_store.py
 ```
 
+## shopper
+- RequestsInstrumentor 는 grocery-store 애플리케이션으로 보내는 웹 요청들을 측정합니다.
+- request 모듈을 통한 GET 메서드 요청을 자동 계측이 담당하고 있으므로 더는 수동 계측을 하지 않아도 됩니다.
+
+```shell
+OTEL_RESOURCE_ATTRIBUTES="service.name=shopper,
+	service.version=0.1.3,
+	net.host.name='hostname',
+	net.host.ip='ipconfig getifaddr en0'" \
+OTEL_TRACES_EXPORTER=console \
+OTEL_PYTHON_TRACER_PROVIDER=sdk \
+OTEL_METRICS_EXPORTER=console \
+OTEL_PYTHON_METER_PROVIDER=sdk \
+OTEL_LOGS_EXPORTER=console \
+OTEL_PYTHON_LOGGER_PROVIDER=sdk \
+opentelemetry-instrument python shopper.py
+```
+
 ---
 
 _Cloud Native Observability_

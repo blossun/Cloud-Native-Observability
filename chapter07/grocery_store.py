@@ -20,10 +20,9 @@ dictConfig(
         "root": {"level": "DEBUG", "handlers": ["otlp"]},
     }
 )
-
-
 app = Flask(__name__)
-app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)  # 요청 처리 중에 추적 정보를 생성 할 수 있는 적절한 메커니즘과 연결되는 미들웨어를 제공
+app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)
+
 
 @app.route("/")
 def welcome():
@@ -32,10 +31,10 @@ def welcome():
 
 @app.route("/products")
 def products():
-        url = "http://localhost:5001/inventory"  # inventory
-        resp = requests.get(url)
-        return resp.text
+    url = "http://localhost:5001/inventory"  # inventory
+    resp = requests.get(url)
+    return resp.text
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=4999)
