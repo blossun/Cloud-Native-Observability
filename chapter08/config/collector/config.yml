@@ -29,6 +29,13 @@ processors: # 처리기
         from_attribute: old-key
       - key: old-key
         action: delete
+  attributes/include-secret:
+    include:
+      match_type: strict # 정확히 일치
+      services: [ "super-secret", "secret" ] # 매칭 대상
+    actions:
+      - key: secret-attr
+        action: delete
 service:
   pipelines: # 파이프라인 설정
     traces/otlp:
@@ -36,9 +43,4 @@ service:
       processors: [attributes/add-key, attributes/update-key] # 처리기 순서 중요
     traces/jaeger:
       receivers: [jaeger]
-      processors: [attributes/copy-and-delete]
-    traces/both:
-      receivers: [otlp, jaeger]
-      processors: [attributes/copy-and-delete]
-    metrics:
-      receivers: [hostmetrics]
+      processors: [attributes/include-secret]
