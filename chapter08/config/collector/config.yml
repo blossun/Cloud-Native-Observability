@@ -1,4 +1,4 @@
-receivers:
+receivers: # 수신기
   hostmetrics:
     collection_interval: 10s
     scrapers:
@@ -11,13 +11,27 @@ receivers:
   jaeger:
     protocols:
       thrift_binary:
+processors: # 처리기
+  attributes/add-key: # 속성 처리기
+    actions:
+      - key: example-key
+        action: insert
+        value: first
+  attributes/update-key:
+    actions:
+      - key: example-key
+        action: update
+        value: second
 service:
-  pipelines:
+  pipelines: # 파이프라인 설정
     traces/otlp:
       receivers: [otlp]
+      processors: [attributes/add-key, attributes/update-key] # 처리기 순서 중요
     traces/jaeger:
       receivers: [jaeger]
+      processors: [attributes/add-key, attributes/update-key]
     traces/both:
       receivers: [otlp, jaeger]
+      processors: [attributes/add-key, attributes/update-key]
     metrics:
       receivers: [hostmetrics]
