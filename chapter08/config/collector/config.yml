@@ -22,6 +22,13 @@ processors: # 처리기
       - key: example-key
         action: update
         value: second
+  attributes/copy-and-delete:
+    actions:
+      - key: new-key
+        action: upsert
+        from_attribute: old-key
+      - key: old-key
+        action: delete
 service:
   pipelines: # 파이프라인 설정
     traces/otlp:
@@ -29,9 +36,9 @@ service:
       processors: [attributes/add-key, attributes/update-key] # 처리기 순서 중요
     traces/jaeger:
       receivers: [jaeger]
-      processors: [attributes/add-key, attributes/update-key]
+      processors: [attributes/copy-and-delete]
     traces/both:
       receivers: [otlp, jaeger]
-      processors: [attributes/add-key, attributes/update-key]
+      processors: [attributes/copy-and-delete]
     metrics:
       receivers: [hostmetrics]
