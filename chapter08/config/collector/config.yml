@@ -2,16 +2,22 @@ receivers:
   otlp:
     protocols:
       grpc:
+processors:
+  batch:
+    timeout: 10s
 exporters:
   logging:
 service:
   pipelines:
     traces:
       receivers: [otlp]
+      processors: [batch]
       exporters: [logging]
     metrics:
       receivers: [otlp]
+      processors: [batch]
       exporters: [logging]
     logs:
       receivers: [otlp]
+      processors: [batch]
       exporters: [logging]
