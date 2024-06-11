@@ -1,46 +1,17 @@
-receivers: # 수신기
-  hostmetrics:
-    collection_interval: 10s
-    scrapers:
-      load:
-      memory:
-      network:
+receivers:
   otlp:
     protocols:
       grpc:
-  jaeger:
-    protocols:
-      thrift_binary:
-processors: # 처리기
-  attributes/add-key: # 속성 처리기
-    actions:
-      - key: example-key
-        action: insert
-        value: first
-  attributes/update-key:
-    actions:
-      - key: example-key
-        action: update
-        value: second
-  attributes/copy-and-delete:
-    actions:
-      - key: new-key
-        action: upsert
-        from_attribute: old-key
-      - key: old-key
-        action: delete
-  attributes/include-secret:
-    include:
-      match_type: strict # 정확히 일치
-      services: [ "super-secret", "secret" ] # 매칭 대상
-    actions:
-      - key: secret-attr
-        action: delete
+exporters:
+  logging:
 service:
-  pipelines: # 파이프라인 설정
-    traces/otlp:
+  pipelines:
+    traces:
       receivers: [otlp]
-      processors: [attributes/add-key, attributes/update-key] # 처리기 순서 중요
-    traces/jaeger:
-      receivers: [jaeger]
-      processors: [attributes/include-secret]
+      exporters: [logging]
+    metrics:
+      receivers: [otlp]
+      exporters: [logging]
+    logs:
+      receivers: [otlp]
+      exporters: [logging]

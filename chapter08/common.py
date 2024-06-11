@@ -1,21 +1,24 @@
 import logging
 import resource
 
+from flask import request
 from opentelemetry import trace
 from opentelemetry._logs import set_logger_provider
+from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
+from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.metrics import set_meter_provider, get_meter_provider, Observation
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
-from opentelemetry.sdk._logs._internal.export import ConsoleLogExporter, BatchLogRecordProcessor
+from opentelemetry.sdk._logs._internal.export import BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics._internal.export import ConsoleMetricExporter, PeriodicExportingMetricReader
+from opentelemetry.sdk.metrics._internal.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.semconv.resource import ResourceAttributes
-from local_machine_resource_detector import LocalMachineResourceDetector
 from opentelemetry.semconv.trace import SpanAttributes
-from flask import request
+
+from local_machine_resource_detector import LocalMachineResourceDetector
 
 
 def configure_logger(name, version):
@@ -30,7 +33,7 @@ def configure_logger(name, version):
     )
     provider = LoggerProvider(resource=resource)  # SDK를 이용해서 LoggerProvider를 생성. resource 인 전달
     set_logger_provider(provider)  # 전역 Logger로 설정
-    exporter = OTLPSpanExporter()
+    exporter = OTLPLogExporter()
     provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
     logger = logging.getLogger(name)   # 표준 Logger 객체 생성
     logger.setLevel(logging.DEBUG)
@@ -40,7 +43,7 @@ def configure_logger(name, version):
 
 
 def configure_meter(name, version):
-    exporter = OTLPSpanExporter()
+    exporter = OTLPMetricExporter()
     reader = PeriodicExportingMetricReader(exporter, export_interval_millis=5000)
     local_resource = LocalMachineResourceDetector().detect()
     resource = local_resource.merge(
