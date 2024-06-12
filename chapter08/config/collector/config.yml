@@ -2,6 +2,11 @@ receivers:
   otlp:
     protocols:
       grpc:
+  hostmetrics:
+    collection_intervals: 10s
+    scrapers:
+      memory:
+      network:
 processors:
   batch:
     timeout: 10s
@@ -15,7 +20,7 @@ service:
       processors: [batch]
       exporters: [logging]
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, hostmetrics]
       processors: [batch]
       exporters: [logging]
     logs:
