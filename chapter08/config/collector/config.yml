@@ -1,0 +1,38 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+  hostmetrics:
+    collection_intervals: 10s
+    scrapers:
+      memory:
+      network:
+        include:
+          match_type: strict
+          interfaces: [lo0]
+processors:
+  batch:
+    timeout: 10s
+  filter/network-connections:
+    metrics:
+      exclude:
+        match_type: strict
+        metric_names:
+          - system.network.connections
+exporters:
+  logging:
+    loglevel: debug
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging]
+    metrics:
+      receivers: [hostmetrics]
+      processors: [batch, filter/network-connections]
+      exporters: [logging]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging]
